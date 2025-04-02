@@ -10,6 +10,14 @@ const PAGE_LIST = {
 
 export default [
   {
+    path: '/RerenderBug',
+    name: 'RerenderBug 组件',
+    component: PAGE_LIST.RerenderBug,
+    meta: {
+      style: 1,
+    },
+  },
+  {
     path: '/View',
     name: 'View 组件',
     component: PAGE_LIST.View,
