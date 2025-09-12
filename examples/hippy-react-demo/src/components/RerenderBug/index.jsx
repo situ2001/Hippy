@@ -41,20 +41,21 @@ export default function BugExpo() {
       {!expanded
         ? (
           <View>
-            <Text>点我，我必定会消失</Text>
-            <Text>第二次见我我就不是黑色了</Text>
-            <Text style={{ color: '#ff6600' }}>下次，你只能看到这行了</Text>
+            <Text>我不应该会消失A</Text>
+            <Text>第也不应该会消失A</Text>
+            <Text>我应该是黑色</Text>
+            <Text style={{ color: '#ff6600' }}>我应该是橙色</Text>
           </View>
         )
         : (
           <View>
-            <Text>点击收起</Text>
-            <Text style={{ color: '#ff6600' }}>点击收起</Text>
-            <Text>我被继承了之前状态的的样式（原先为黑色字体）</Text>
+            <Text>我不应该会消失B</Text>
+            <Text>第也不应该会消失B</Text>
+            <Text style={{ color: '#ff6600' }}>我应该是橙色</Text>
+            <Text>我应该是黑色</Text>
           </View>
         )
       }
     </Expand>
   </View>;
 }
-
