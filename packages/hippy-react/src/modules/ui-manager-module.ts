@@ -20,7 +20,12 @@
 
 import { Fiber } from '@hippy/react-reconciler';
 import { Bridge, Device, UIManager } from '../global';
-import { getRootViewId, findNodeById, findNodeByCondition } from '../utils/node';
+import {
+  getRootViewId,
+  findNodeById,
+  findNodeByCondition,
+  getFiberNodeFromId,
+} from '../utils/node';
 import { isFunction, warn, trace } from '../utils';
 import Element from '../dom/element-node';
 
@@ -35,6 +40,98 @@ const {
 } = UIManager;
 
 const getNodeById = findNodeById;
+
+interface InspectorSource {
+  fileName: string;
+  lineNumber: number;
+  columnNumber?: number;
+}
+
+interface InspectorFiberData {
+  name: string;
+  source: InspectorSource | null;
+}
+
+interface InspectorNodeData {
+  nodeId: number;
+  nativeName: string | null;
+  componentName: string | null;
+  source: InspectorSource | null;
+  fiberStack: InspectorFiberData[];
+}
+
+function getFiberName(fiber: any): string | null {
+  const { type } = fiber || {};
+  if (typeof type === 'string') {
+    return type;
+  }
+  if (typeof type === 'function') {
+    return type.displayName || type.name || null;
+  }
+  if (type && typeof type === 'object') {
+    return type.displayName || type.name || null;
+  }
+  return null;
+}
+
+function getFiberSource(fiber: any): InspectorSource | null {
+  const source = fiber?._debugSource;
+  if (!source || typeof source.fileName !== 'string' || typeof source.lineNumber !== 'number') {
+    return null;
+  }
+  const result: InspectorSource = {
+    fileName: source.fileName,
+    lineNumber: source.lineNumber,
+  };
+  if (typeof source.columnNumber === 'number') {
+    result.columnNumber = source.columnNumber;
+  }
+  return result;
+}
+
+/**
+ * Resolve a native Hippy node to serializable React/Fiber inspection data.
+ * This intentionally does not expose the Fiber object across the native bridge.
+ */
+function getInspectorDataForNode(nodeId: number): InspectorNodeData | null {
+  if (typeof nodeId !== 'number') {
+    return null;
+  }
+
+  const targetNode = getFiberNodeFromId(nodeId) || findNodeById(nodeId);
+  if (!targetNode) {
+    return null;
+  }
+
+  const element = targetNode.stateNode;
+  const fiberStack: InspectorFiberData[] = [];
+  let source = getFiberSource(targetNode);
+  let componentName: string | null = null;
+  let currentNode: any = targetNode;
+
+  while (currentNode) {
+    const name = getFiberName(currentNode);
+    const currentSource = getFiberSource(currentNode);
+    if (!source && currentSource) {
+      source = currentSource;
+    }
+    if (name) {
+      if (!componentName && typeof currentNode.type !== 'string') {
+        componentName = name;
+      }
+      fiberStack.push({ name, source: currentSource });
+    }
+    currentNode = currentNode.return;
+  }
+
+  return {
+    nodeId,
+    nativeName: element?.nativeName || element?.meta?.component?.name || null,
+    componentName: componentName || getFiberName(targetNode),
+    source,
+    fiberStack,
+  };
+}
 
 /**
  * Get the nodeId from FiberNode ref.
@@ -221,6 +318,7 @@ export {
   endBatch,
   sendRenderError,
   getNodeById,
+  getInspectorDataForNode,
   getNodeIdByRef,
   getElementFromFiberRef,
   callUIFunction,

@@ -89,6 +89,7 @@ module.exports = {
               plugins: [
                 ['@babel/plugin-proposal-class-properties'],
                 ['@babel/plugin-proposal-decorators', { legacy: true }],
+                require.resolve('@babel/plugin-transform-react-jsx-source'),
                 ['@babel/plugin-transform-runtime', { regenerator: true }],
                 require.resolve('react-refresh/babel'),
               ],

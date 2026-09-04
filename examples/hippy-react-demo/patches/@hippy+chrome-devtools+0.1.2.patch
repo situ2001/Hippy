@@ -1,0 +1,160 @@
+diff --git a/node_modules/@hippy/chrome-devtools/out/Release/gen/front_end/core/sdk/DOMModel.js b/node_modules/@hippy/chrome-devtools/out/Release/gen/front_end/core/sdk/DOMModel.js
+index 9da119c..854239b 100644
+--- a/node_modules/@hippy/chrome-devtools/out/Release/gen/front_end/core/sdk/DOMModel.js
++++ b/node_modules/@hippy/chrome-devtools/out/Release/gen/front_end/core/sdk/DOMModel.js
+@@ -681,7 +681,35 @@ export class DOMNode {
+     if (!node) {
+       throw new Error("In DOMNode.setAsInspectedNode: node is expected to not be null.");
+     }
++    console.log("[Hippy Inspector] selecting node:", node.id);
+     await this.#agent.invoke_setInspectedNode({ nodeId: node.id });
++    console.log("[Hippy Inspector] DOM.setInspectedNode completed:", node.id);
++    const runtimeModel = this.#domModelInternal.runtimeModel();
++    console.log("[Hippy Inspector] runtime model available:", Boolean(runtimeModel));
++    const executionContext = runtimeModel &&
++      (runtimeModel.defaultExecutionContext() || runtimeModel.executionContexts()[0]);
++    console.log("[Hippy Inspector] execution context:", executionContext ? executionContext.id : null);
++    if (executionContext) {
++      try {
++        const expression =
++          "typeof global !== 'undefined' && global.__HIPPY_INSPECTOR__ && " +
++          "typeof global.__HIPPY_INSPECTOR__.inspectNode === 'function' ? " +
++          "global.__HIPPY_INSPECTOR__.inspectNode(" + node.id + ") : null";
++        console.log("[Hippy Inspector] Runtime.evaluate expression:", expression);
++        const evaluation = await executionContext.evaluate({
++          expression,
++          silent: true,
++          returnByValue: true,
++        }, false, true);
++        console.log("[Hippy Inspector] Runtime.evaluate result:", evaluation);
++        const inspectorData = evaluation && evaluation.object && evaluation.object.value;
++        console.log("[Hippy Inspector] inspector data:", inspectorData);
++      } catch (error) {
++        console.log("[Hippy Inspector] Runtime.evaluate failed:", error);
++      }
++    } else {
++      console.log("[Hippy Inspector] no execution context for node:", node.id);
++    }
+   }
+   enclosingElementOrSelf() {
+     let node = this;
+diff --git a/node_modules/@hippy/chrome-devtools/out/Release/gen/front_end/core/sdk/sdk.js b/node_modules/@hippy/chrome-devtools/out/Release/gen/front_end/core/sdk/sdk.js
+index a304a79..fcf6ba3 100644
+--- a/node_modules/@hippy/chrome-devtools/out/Release/gen/front_end/core/sdk/sdk.js
++++ b/node_modules/@hippy/chrome-devtools/out/Release/gen/front_end/core/sdk/sdk.js
+@@ -14541,7 +14541,35 @@ var DOMNode = class {
+     if (!node) {
+       throw new Error("In DOMNode.setAsInspectedNode: node is expected to not be null.");
+     }
++    console.log("[Hippy Inspector] selecting node:", node.id);
+     await this.#agent.invoke_setInspectedNode({ nodeId: node.id });
++    console.log("[Hippy Inspector] DOM.setInspectedNode completed:", node.id);
++    const runtimeModel = this.#domModelInternal.runtimeModel();
++    console.log("[Hippy Inspector] runtime model available:", Boolean(runtimeModel));
++    const executionContext = runtimeModel &&
++      (runtimeModel.defaultExecutionContext() || runtimeModel.executionContexts()[0]);
++    console.log("[Hippy Inspector] execution context:", executionContext ? executionContext.id : null);
++    if (executionContext) {
++      try {
++        const expression =
++          "typeof global !== 'undefined' && global.__HIPPY_INSPECTOR__ && " +
++          "typeof global.__HIPPY_INSPECTOR__.inspectNode === 'function' ? " +
++          "global.__HIPPY_INSPECTOR__.inspectNode(" + node.id + ") : null";
++        console.log("[Hippy Inspector] Runtime.evaluate expression:", expression);
++        const evaluation = await executionContext.evaluate({
++          expression,
++          silent: true,
++          returnByValue: true,
++        }, false, true);
++        console.log("[Hippy Inspector] Runtime.evaluate result:", evaluation);
++        const inspectorData = evaluation && evaluation.object && evaluation.object.value;
++        console.log("[Hippy Inspector] inspector data:", inspectorData);
++      } catch (error) {
++        console.log("[Hippy Inspector] Runtime.evaluate failed:", error);
++      }
++    } else {
++      console.log("[Hippy Inspector] no execution context for node:", node.id);
++    }
+   }
+   enclosingElementOrSelf() {
+     let node = this;
+diff --git a/node_modules/@hippy/chrome-devtools/out/Version/gen/front_end/core/sdk/DOMModel.js b/node_modules/@hippy/chrome-devtools/out/Version/gen/front_end/core/sdk/DOMModel.js
+index 5bfba17..bbefa3b 100644
+--- a/node_modules/@hippy/chrome-devtools/out/Version/gen/front_end/core/sdk/DOMModel.js
++++ b/node_modules/@hippy/chrome-devtools/out/Version/gen/front_end/core/sdk/DOMModel.js
+@@ -681,7 +681,35 @@ export class DOMNode {
+     if (!node) {
+       throw new Error("In DOMNode.setAsInspectedNode: node is expected to not be null.");
+     }
++    console.log("[Hippy Inspector] selecting node:", node.id);
+     await this.#agent.invoke_setInspectedNode({ nodeId: node.id });
++    console.log("[Hippy Inspector] DOM.setInspectedNode completed:", node.id);
++    const runtimeModel = this.#domModelInternal.runtimeModel();
++    console.log("[Hippy Inspector] runtime model available:", Boolean(runtimeModel));
++    const executionContext = runtimeModel &&
++      (runtimeModel.defaultExecutionContext() || runtimeModel.executionContexts()[0]);
++    console.log("[Hippy Inspector] execution context:", executionContext ? executionContext.id : null);
++    if (executionContext) {
++      try {
++        const expression =
++          "typeof global !== 'undefined' && global.__HIPPY_INSPECTOR__ && " +
++          "typeof global.__HIPPY_INSPECTOR__.inspectNode === 'function' ? " +
++          "global.__HIPPY_INSPECTOR__.inspectNode(" + node.id + ") : null";
++        console.log("[Hippy Inspector] Runtime.evaluate expression:", expression);
++        const evaluation = await executionContext.evaluate({
++          expression,
++          silent: true,
++          returnByValue: true,
++        }, false, true);
++        console.log("[Hippy Inspector] Runtime.evaluate result:", evaluation);
++        const inspectorData = evaluation && evaluation.object && evaluation.object.value;
++        console.log("[Hippy Inspector] inspector data:", inspectorData);
++      } catch (error) {
++        console.log("[Hippy Inspector] Runtime.evaluate failed:", error);
++      }
++    } else {
++      console.log("[Hippy Inspector] no execution context for node:", node.id);
++    }
+   }
+   enclosingElementOrSelf() {
+     let node = this;
+diff --git a/node_modules/@hippy/chrome-devtools/out/Version/gen/front_end/core/sdk/sdk.js b/node_modules/@hippy/chrome-devtools/out/Version/gen/front_end/core/sdk/sdk.js
+index 679782d..98d1b0c 100644
+--- a/node_modules/@hippy/chrome-devtools/out/Version/gen/front_end/core/sdk/sdk.js
++++ b/node_modules/@hippy/chrome-devtools/out/Version/gen/front_end/core/sdk/sdk.js
+@@ -14541,7 +14541,35 @@ var DOMNode = class {
+     if (!node) {
+       throw new Error("In DOMNode.setAsInspectedNode: node is expected to not be null.");
+     }
++    console.log("[Hippy Inspector] selecting node:", node.id);
+     await this.#agent.invoke_setInspectedNode({ nodeId: node.id });
++    console.log("[Hippy Inspector] DOM.setInspectedNode completed:", node.id);
++    const runtimeModel = this.#domModelInternal.runtimeModel();
++    console.log("[Hippy Inspector] runtime model available:", Boolean(runtimeModel));
++    const executionContext = runtimeModel &&
++      (runtimeModel.defaultExecutionContext() || runtimeModel.executionContexts()[0]);
++    console.log("[Hippy Inspector] execution context:", executionContext ? executionContext.id : null);
++    if (executionContext) {
++      try {
++        const expression =
++          "typeof global !== 'undefined' && global.__HIPPY_INSPECTOR__ && " +
++          "typeof global.__HIPPY_INSPECTOR__.inspectNode === 'function' ? " +
++          "global.__HIPPY_INSPECTOR__.inspectNode(" + node.id + ") : null";
++        console.log("[Hippy Inspector] Runtime.evaluate expression:", expression);
++        const evaluation = await executionContext.evaluate({
++          expression,
++          silent: true,
++          returnByValue: true,
++        }, false, true);
++        console.log("[Hippy Inspector] Runtime.evaluate result:", evaluation);
++        const inspectorData = evaluation && evaluation.object && evaluation.object.value;
++        console.log("[Hippy Inspector] inspector data:", inspectorData);
++      } catch (error) {
++        console.log("[Hippy Inspector] Runtime.evaluate failed:", error);
++      }
++    } else {
++      console.log("[Hippy Inspector] no execution context for node:", node.id);
++    }
+   }
+   enclosingElementOrSelf() {
+     let node = this;
