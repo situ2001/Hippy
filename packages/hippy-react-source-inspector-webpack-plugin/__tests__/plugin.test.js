@@ -56,3 +56,11 @@ test('plugin is disabled in production', (t) => {
   t.deepEqual(compiler.options.entry, { index: ['./src/main.js'] });
   t.deepEqual(compiler.options.module.rules[0].oneOf[0].use[0].options.plugins, []);
 });
+
+test('debug-server integration can be disabled', (t) => {
+  const oldNodeOptions = process.env.NODE_OPTIONS;
+  const compiler = createCompiler();
+  new HippyReactSourceInspectorWebpackPlugin({ debugServer: false }).apply(compiler);
+
+  t.is(process.env.NODE_OPTIONS, oldNodeOptions);
+});

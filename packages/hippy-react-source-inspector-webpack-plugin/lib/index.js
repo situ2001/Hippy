@@ -19,10 +19,20 @@
  */
 
 const path = require('path');
+const { installDebugServerMiddleware } = require('./debug-server-adapter');
 
 const PLUGIN_NAME = 'HippyReactSourceInspectorWebpackPlugin';
 const UI_MODULE_ALIAS = '__HIPPY_REACT_SOURCE_INSPECTOR_UI_MODULE__';
 const RUNTIME_ENTRY = path.resolve(__dirname, 'runtime-entry.js');
+const DEBUG_SERVER_REGISTER = path.resolve(__dirname, 'debug-server-register.js');
+
+function enableDebugServerChildRegistration() {
+  const requireOption = `--require=${JSON.stringify(DEBUG_SERVER_REGISTER)}`;
+  const nodeOptions = process.env.NODE_OPTIONS || '';
+  if (!nodeOptions.includes(DEBUG_SERVER_REGISTER)) {
+    process.env.NODE_OPTIONS = `${nodeOptions} ${requireOption}`.trim();
+  }
+}
 
 function isBabelLoader(loader) {
   return typeof loader === 'string'
@@ -163,6 +173,9 @@ function resolveReactModule(options, compiler) {
 class HippyReactSourceInspectorWebpackPlugin {
   constructor(options = {}) {
     this.options = options;
+    if (this.options.debugServer !== false) {
+      enableDebugServerChildRegistration();
+    }
   }
 
   apply(compiler) {
@@ -188,6 +201,20 @@ class HippyReactSourceInspectorWebpackPlugin {
     compiler.options.resolve = resolveOptionsWithAlias(compiler.options.resolve, reactModule);
     // eslint-disable-next-line no-param-reassign
     compiler.options.entry = prependEntry(compiler.options.entry, RUNTIME_ENTRY);
+
+    if (this.options.debugServer !== false) {
+      const logger = compiler.getInfrastructureLogger
+        ? compiler.getInfrastructureLogger(PLUGIN_NAME)
+        : null;
+      installDebugServerMiddleware(compiler.context, {
+        adapters: this.options.hippyDebugServer,
+        onError(error, packageName) {
+          if (logger) {
+            logger.warn(`Could not register ${packageName} inspector middleware: ${error.message}`);
+          }
+        },
+      });
+    }
   }
 }
 

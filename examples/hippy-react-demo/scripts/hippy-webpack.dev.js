@@ -4,7 +4,8 @@ const webpack = require('webpack');
 const HippyDynamicImportPlugin = require('@hippy/hippy-dynamic-import-plugin');
 const ReactRefreshWebpackPlugin = require('@hippy/hippy-react-refresh-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HippyReactSourceInspectorWebpackPlugin = require('@hippy/react-source-inspector-webpack-plugin');
+// const HippyReactSourceInspectorWebpackPlugin = require('@hippy/react-source-inspector-webpack-plugin');
+const HippyReactSourceInspectorWebpackPlugin = require('../../../packages/hippy-react-source-inspector-webpack-plugin/lib/index.js');
 const pkg = require('../package.json');
 
 module.exports = {
