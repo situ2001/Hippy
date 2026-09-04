@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const HippyDynamicImportPlugin = require('@hippy/hippy-dynamic-import-plugin');
 const ReactRefreshWebpackPlugin = require('@hippy/hippy-react-refresh-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HippyReactSourceInspectorWebpackPlugin = require('@hippy/react-source-inspector-webpack-plugin');
 const pkg = require('../package.json');
 
 module.exports = {
@@ -62,6 +63,7 @@ module.exports = {
     new ReactRefreshWebpackPlugin({
       overlay: false,
     }),
+    new HippyReactSourceInspectorWebpackPlugin(),
     new CleanWebpackPlugin(),
   ],
   module: {
@@ -89,7 +91,6 @@ module.exports = {
               plugins: [
                 ['@babel/plugin-proposal-class-properties'],
                 ['@babel/plugin-proposal-decorators', { legacy: true }],
-                require.resolve('@babel/plugin-transform-react-jsx-source'),
                 ['@babel/plugin-transform-runtime', { regenerator: true }],
                 require.resolve('react-refresh/babel'),
               ],

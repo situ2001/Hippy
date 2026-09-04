@@ -128,6 +128,7 @@ module.exports = {
           '__ISHIPPY__',
           '__GLOBAL__',
           '__HIPPYNATIVEGLOBAL__',
+          '__HIPPY_DEVTOOLS__',
           '__instanceId__',
           '_reactInternalFiber',
           '_reactInternals',
